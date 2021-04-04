@@ -343,39 +343,20 @@ class ShapeKeyApplier(bpy.types.Operator):
         return {'FINISHED'}
 
 
+# Based on code by GiveMeAllYourCats - https://github.com/michaeldegroot/cats-blender-plugin
+# Adds buttons to the shapekey menu
+def addToShapekeyMenu(self, context):
+    self.layout.separator()
+    self.layout.operator(ShapeKeySplitter.bl_idname, text="Split Shapekeys", icon="FULLSCREEN_ENTER")
+    self.layout.operator(ShapeKeyPreserver.bl_idname, text="Apply Modifiers and Keep Shapekeys", icon="MODIFIER")
+    self.layout.operator(ShapeKeyApplier.bl_idname, text="Apply Selected Shapekey as Basis", icon="KEY_HLT")
 
-
-# I'm honestly not sure how to add this to an existing menu in 2.8, so rather than go
-# down a rabbit-hole of research, I'm just adding a panel, because it works and is
-# quick to do. Someone should probably look at this and do better than I have.
-class PT_shapeKeyHelpers(bpy.types.Panel):
-    """Creates a Panel in the Object properties window"""
-    bl_label = "Shapekey tools"
-    bl_idname = "SHAPEHELPER_PT_uipanel"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = "data"
-
-
-    
-    @classmethod
-    def poll(cls, context):
-        return bpy.context.active_object.type == 'MESH'
-
-    
-    def draw(self, context):
-        self.layout.separator()
-        self.layout.operator(ShapeKeySplitter.bl_idname, text="Split Shapekeys", icon="FULLSCREEN_ENTER")
-        self.layout.operator(ShapeKeyPreserver.bl_idname, text="Apply Modifiers and Keep Shapekeys", icon="MODIFIER")
-        self.layout.operator(ShapeKeyApplier.bl_idname, text="Apply Selected Shapekey as Basis", icon="KEY_HLT")
 
 
 classes = (
     ShapeKeySplitter,
     ShapeKeyPreserver,
-    ShapeKeyApplier,
-    PT_shapeKeyHelpers
-
+    ShapeKeyApplier
 )
     
 
@@ -383,11 +364,29 @@ def register():
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
+    
+    # Add shapekey button to shapekey menu
+    if hasattr(bpy.types, 'MESH_MT_shape_key_specials'):  # pre 2.80
+        bpy.types.MESH_MT_shape_key_specials.append(addToShapekeyMenu)
+    else:
+        bpy.types.MESH_MT_shape_key_context_menu.append(addToShapekeyMenu)
+
 
 def unregister():
     from bpy.utils import unregister_class
     for cls in reversed(classes):
         unregister_class(cls)
+    
+    # Remove shapekey button from shapekey menu
+    try:
+        if hasattr(bpy.types, 'MESH_MT_shape_key_specials'):  # pre 2.80
+            bpy.types.MESH_MT_shape_key_specials.remove(addToShapekeyMenu)
+        else:
+            bpy.types.MESH_MT_shape_key_context_menu.remove(addToShapekeyMenu)
+
+    except AttributeError:
+        print('shapekey button was not registered')
+        pass
 
 
 
