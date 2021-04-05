@@ -120,12 +120,12 @@ class ShapeKeyPreserver(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if len(bpy.context.object.modifiers) == 1 and bpy.context.object.modifiers[0].type != 'ARMATURE':
-            return True
-        elif len(bpy.context.object.modifiers) > 1:
-            return True      
-        else:
-            return False
+        if bpy.context.object.active_shape_key and bpy.context.object.active_shape_key_index > 0:
+            if len(bpy.context.object.modifiers) == 1 and bpy.context.object.modifiers[0].type != 'ARMATURE':
+                return True
+            elif len(bpy.context.object.modifiers) > 1:
+                return True        
+        return False
     
     def execute(self, context):
     
