@@ -29,6 +29,7 @@ class ShapeKeySplitter(bpy.types.Operator):
     """Creates a new object with the shapekeys split based on two vertex groups, named 'left' and 'right', that you must create manually"""
     bl_idname = "object.shape_key_splitter"
     bl_label = "Split Shapekeys"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
     
     @classmethod
     def poll(cls, context):
@@ -117,6 +118,7 @@ class ShapeKeyPreserver(bpy.types.Operator):
 
     bl_idname = "object.shape_key_preserver"
     bl_label = "Apply Modifiers and Keep Shapekeys"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     @classmethod
     def poll(cls, context):
@@ -288,6 +290,7 @@ class ShapeKeyApplier(bpy.types.Operator):
     """Replace the 'Basis' shape key with the currently selected shape key"""
     bl_idname = "object.shape_key_applier"
     bl_label = "Apply Selected Shapekey as Basis"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
     
     @classmethod
     def poll(cls, context):
